@@ -1,0 +1,36 @@
+﻿input {
+	height: 22px;
+	font-size: 12pt;
+}
+
+th {
+	font-size: 14pt;
+}
+
+table {
+	margin-left: -3px;
+}
+
+.btn {
+    width: 25px;
+	height: 25px;
+	margin-left: -4px;
+}
+
+#year {
+	width: 45px;
+	margin-left: -4px;
+}
+
+#month {
+	margin-left: -4px;
+}
+
+#date {
+	width: 25px;
+	margin-left: -4px;
+}
+
+#dayOfWeek {
+	background: PeachPuff;
+}

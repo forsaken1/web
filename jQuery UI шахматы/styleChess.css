@@ -1,0 +1,26 @@
+﻿.firstPlayer {
+	font-size: 40pt;
+	margin-left: 10px;
+}
+
+.secondPlayer {
+	font-size: 40pt;
+	color: green;
+	margin-left: 10px;
+}
+
+.side {
+	font-size: 30pt;
+	margin-left: 20px;
+}
+
+td {
+	width: 75px;
+	height: 75px;
+	background: IndianRed;
+}
+
+div {
+	cursor: default;
+	-moz-user-select: -moz-none;
+}
