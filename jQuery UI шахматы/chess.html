@@ -5,11 +5,23 @@
     <link rel = "stylesheet" type = "text/css" href = "styleChess.css">
     <script src = "jquery-1.6.2.min.js"></script>
     <script src = "jquery-ui-1.8.16.custom.min.js"></script>
+	<title>Шахматы</title>
   </head>
 <body>
   <script>
+	var table;
 	var step = false;
-  
+	var color = 'green'; //цвет области возможного хода
+	var color1 = 'white'; //цвета..
+	var color2 = 'pink1'; //клеток доски
+	var figureSize = 18; 
+	var sideLetterSize = 20;
+	var cell = new Array(8);
+	for(i = 0; i < 8; i++) cell[i] = new Array(8);
+	var letter = ['', 'A', 'B', 'C', 'D', 'E', 'F', 'G', 'H'];
+	var whiteFigures = ['♖', '♘', '♗', '♕', '♔', '♗', '♘', '♖'];
+	var blackFigures = ['♜', '♞', '♝', '♛', '♚', '♝', '♞', '♜'];
+    ////////////////////////////////////////////////////////////////////
 	function changeMove() {
 		if(step) {
 			$('.firstPlayer').draggable('enable');
@@ -21,106 +33,186 @@
 		}
 		step = !step;
 	}
-  
-	$('<table></table>').attr('border', '1').attr('cellspacing', '0').attr('id', 'field').attr('width', '675').attr('height', '675').appendTo('body');
-    var iter = 0;
-	var letter = ['', 'A', 'B', 'C', 'D', 'E', 'F', 'G', 'H'];
-	var cell = new Array(8);
-	for(i = 0; i < 8; i++) cell[i] = new Array(8);
-	
-	for(i = 0; i < 9; i++) {
-		$('<tr></tr>').appendTo('#field');
-		for(j = 0; j < 9; j++) {
-			$('<td></td>').appendTo('tr:last-child');
-			
-			if(j == 0 && i != 8) 
-			    $('<div></div>').text(8 - i).addClass('side').appendTo('td:last'); 
-			else if(i == 8) 
-			    $('<div></div>').text(letter[j]).addClass('side').appendTo('td:last'); 
-			else {
-				$('td:last').css('background', i % 2 != j % 2 ? 'Wheat' : 'SaddleBrown').addClass('cell').attr('id', ++iter);
+	////////////////////////////////////////////////////////////////////сборка шахматной доски и постановка фигур
+	function addFigure(i, figure, side) {
+		$('<div>').css('font-size', table.attr('height') / figureSize).addClass(side).html(figure).appendTo('#' + i);
+	}
+		
+	function startGame() {
+		var iter = 0;
+		table = $('<table>').attr({border: 1, cellspacing: 1, id: 'field', width: 675, height: 675}).appendTo('body');
+		for(i = 0; i < 9; i++) {
+			var trLast = $('<tr>').appendTo(table);
+			for(j = 0; j < 9; j++) {
+				var thLast = $('<th>').appendTo(trLast);
+				if(j == 0 && i != 8) 
+					$('<div>').text(8 - i).css({'font-size': table.attr('height') / sideLetterSize, 'width': 30, 'height': 45}).addClass('side').appendTo(thLast); 
+				else if(i == 8) 
+					$('<div>').text(letter[j]).css({'font-size': table.attr('height') / sideLetterSize, 'width': 30, 'height': 45}).addClass('side').appendTo(thLast); 
+				else 
+					cell[i][j - 1] = thLast.css('background', i % 2 != j % 2 ? color1 : color2).addClass('cell').attr('id', ++iter);
 			}
-		}
+		}	
+		
+		for(i = 1; i <= 8;   i++) addFigure(i, blackFigures[i - 1], 'firstPlayer');
+		for(i = 9; i <= 16;  i++) addFigure(i, '♟', 'firstPlayer');
+		for(i = 49; i <= 56; i++) addFigure(i, '♙', 'secondPlayer');
+		for(i = 57; i <= 64; i++) addFigure(i, whiteFigures[i - 57], 'secondPlayer');
 	}
 	
-	$('#field').resizable({
+	startGame();
+	////////////////////////////////////////////////////////////////////
+	table.resizable({
 	    aspectRatio: true,
 		resize: function(event, ui) {
-			$('td').attr('height', ui.size.height / 9);
-			$('td').attr('width', ui.size.height / 9);
-			$('div').css('font-size', ui.size.height / 17);
-		},
-		stop: function(event, ui) {
-			$('td').attr('height', ui.size.height / 9);
-			$('td').attr('width', ui.size.height / 9);
+			ui.size.height = ui.size.width;
+			$('th').attr('height', ui.size.height / 9);
+			$('th').attr('width', ui.size.width / 9);
+			$('div').css('font-size', ui.size.height / figureSize);
+			$('div.side').css({'font-size': ui.size.height / sideLetterSize, 'margin-left': ui.size.height/36})
 		},
 		maxWidth: 1000,
 		maxHeight: 1000,
-		minWidth: 250,
-		minHeight: 250
+		minWidth: 400,
+		minHeight: 400
 	});
 	
-	var whiteFigures = ['♖', '♘', '♗', '♕', '♔', '♗', '♘', '♖'];
-	var blackFigures = ['♜', '♞', '♝', '♚', '♛', '♝', '♞', '♜'];
-	
-	for(i = 1; i <= 64; i++) {
-		if(1 <= i && i <= 8) 
-			$('<div></div>').attr('class', 'firstPlayer').html(whiteFigures[i - 1]).appendTo('#' + i);
-			
-		if(9 <= i && i <= 16)
-			$('<div>♟</div>').attr('class', 'firstPlayer').appendTo('#' + i);
-			
-		if(49 <= i && i <= 56)
-			$('<div>♙</div>').attr('class', 'secondPlayer').appendTo('#' + i);
-			
-		if(57 <= i && i <= 64)
-			$('<div></div>').attr('class', 'secondPlayer').html(blackFigures[i - 57]).appendTo('#' + i);
+	$('.firstPlayer').draggable({addClasses: false, revert: true, containment: table});
+	$('.secondPlayer').draggable({addClasses: false, revert: true, containment: table});
+	////////////////////////////////////////////////////////////////////проверка на наличие в клетке дружественной фигуры (дабы запретить ее, клетки, выделение)
+	function checkAndAdd(a, b) { 
+	    if(a.children().attr('class') == b.children().attr('class'))  return;
+		b.addClass('step').css('background', color);
+		if(b.children().text() != '') b.css('background', 'red');
+		a.css('background', 'pink4');
 	}
-	
-	
-	$('.firstPlayer').draggable({
-		addClasses: false,
-		revert: true,
-		containment: '#field',
-	});
-	
-	$('.secondPlayer').draggable({
-		addClasses: false,
-		revert: true,
-		containment: '#field'
-	});
-	
-	$('.cell').droppable({
+	////////////////////////////////////////////////////////////////////
+	function kingStep(i, j) {
+		var c = cell[i][j];
+		if(i > 0) 			checkAndAdd(c, cell[i - 1][j]); 
+		if(i > 0 && j > 0) 	checkAndAdd(c, cell[i - 1][j - 1]); 
+		if(i < 7) 			checkAndAdd(c, cell[i + 1][j]);
+	    if(i < 7 && j < 7) 	checkAndAdd(c, cell[i + 1][j + 1]); 
+	    if(j > 0) 			checkAndAdd(c, cell[i][j - 1]);
+		if(j > 0 && i < 7) 	checkAndAdd(c, cell[i + 1][j - 1]);
+		if(j < 7) 			checkAndAdd(c, cell[i][j + 1]);
+		if(j < 7 && i > 0) 	checkAndAdd(c, cell[i - 1][j + 1]); 
+	}
+	////////////////////////////////////////////////////////////////////
+	function horseStep(i, j) {
+		var c = cell[i][j];
+		if(i > 0 && j > 1)  checkAndAdd(c, cell[i - 1][j - 2]); 
+		if(i > 1 && j > 0) 	checkAndAdd(c, cell[i - 2][j - 1]); 
+		if(i > 1 && j < 7)  checkAndAdd(c, cell[i - 2][j + 1]);
+		if(i > 0 && j < 6) 	checkAndAdd(c, cell[i - 1][j + 2]); 
+		if(i < 7 && j < 6)  checkAndAdd(c, cell[i + 1][j + 2]);
+		if(i < 6 && j < 7) 	checkAndAdd(c, cell[i + 2][j + 1]);
+		if(i < 6 && j > 0)	checkAndAdd(c, cell[i + 2][j - 1]);
+		if(i < 7 && j > 1) 	checkAndAdd(c, cell[i + 1][j - 2]); 
+	}
+    ////////////////////////////////////////////////////////////////////
+	function queenStep(i, j) {
+		castleStep(i, j);
+		elephantStep(i, j);
+	}
+	////////////////////////////////////////////////////////////////////
+	function castleStep(i, j) {
+		var c = cell[i][j];
+		for(k = i + 1; k <= 7; k++) { checkAndAdd(c, cell[k][j]); if(cell[k][j].text() != '') break; }
+		for(k = i - 1; k >= 0; k--) { checkAndAdd(c, cell[k][j]); if(cell[k][j].text() != '') break; }
+		for(k = j + 1; k <= 7; k++) { checkAndAdd(c, cell[i][k]); if(cell[i][k].text() != '') break; } 
+		for(k = j - 1; k >= 0; k--) { checkAndAdd(c, cell[i][k]); if(cell[i][k].text() != '') break; }
+	}
+	////////////////////////////////////////////////////////////////////
+	function elephantStep(i, j) {
+		var c = cell[i][j];
+		for(k = i + 1, l = j + 1; k <= 7 && l <= 7; k++, l++) { checkAndAdd(c, cell[k][l]); if(cell[k][l].text() != '') break; }
+		for(k = i + 1, l = j - 1; k <= 7 && l >= 0; k++, l--) { checkAndAdd(c, cell[k][l]); if(cell[k][l].text() != '') break; }
+		for(k = i - 1, l = j + 1; k >= 0 && l <= 7; k--, l++) { checkAndAdd(c, cell[k][l]);	if(cell[k][l].text() != '') break; }
+		for(k = i - 1, l = j - 1; k >= 0 && l >= 0; k--, l--) { checkAndAdd(c, cell[k][l]); if(cell[k][l].text() != '') break; }
+	}
+	////////////////////////////////////////////////////////////////////
+	function whitePawnStep(i, j) {
+		if(i > 0) {
+			cell[i][j].css('background', 'pink4');
+			if(cell[i - 1][j].text() == '') {
+			    cell[i - 1][j].addClass('step').css('background', color);
+				if(i == 6  && cell[i - 2][j].text() == '')   cell[i - 2][j].addClass('step').css('background', color);
+			}
+			if(j > 0 && cell[i - 1][j - 1].children().attr('class') == 'firstPlayer ui-draggable-disabled ui-state-disabled') cell[i - 1][j - 1].css('background', 'red').addClass('step');
+			if(j < 7 && cell[i - 1][j + 1].children().attr('class') == 'firstPlayer ui-draggable-disabled ui-state-disabled') cell[i - 1][j + 1].css('background', 'red').addClass('step');
+		}
+		else cell[i][j].children().text('♕'); 
+	}
+	////////////////////////////////////////////////////////////////////
+	function blackPawnStep(i, j) {
+	    if(i < 7) {
+			cell[i][j].css('background', 'pink4');
+			if(cell[i + 1][j].text() == '') {
+				cell[i + 1][j].addClass('step').css('background', color);
+				if(i == 1 && cell[i + 2][j].text() == '') cell[i + 2][j].addClass('step').css('background', color);
+		    }
+			if(j > 0 && cell[i + 1][j - 1].children().attr('class') == 'secondPlayer ui-draggable-disabled ui-state-disabled') cell[i + 1][j - 1].css('background', 'red').addClass('step');
+			if(j < 7 && cell[i + 1][j + 1].children().attr('class') == 'secondPlayer ui-draggable-disabled ui-state-disabled') cell[i + 1][j + 1].css('background', 'red').addClass('step');
+		}
+		else cell[i][j].children().text('♛');
+	}
+	////////////////////////////////////////////////////////////////////
+	$('.cell').droppable({//cell[i][j] - ячейка, ui.helper - перемещаемая фигура
 		addClasses: false,
 		tolerance: 'pointer',
-		drop: function(event, ui) {
+		activate: function(event, ui) {
+			for(i = 0; i < 8; i++)
+			    for(j = 0; j < 8; j++)
+				    if(cell[i][j].attr('id') == ui.helper.parent().attr('id')) {
+					    switch(ui.helper.text()) {
+							case '♔': case '♚': kingStep(i, j); break;
+							case '♙': 			  whitePawnStep(i, j); break;
+							case '♟': 			  blackPawnStep(i, j); break;
+							case '♘': case '♞': horseStep(i, j); break;
+							case '♗': case '♝': elephantStep(i, j); break;
+							case '♖': case '♜': castleStep(i, j);	break;
+							case '♕': case '♛': queenStep(i, j); break;
+						}
+					}
+		},
+		drop: function(event, ui) {//figure - фигура, расположенная в "принимающей" клетке доски
 			var figure = $('#' + $(this).attr('id') + ' div');
 			
 			if(ui.helper.attr('class') == 'firstPlayer ui-draggable-dragging') {
-				if(figure.attr('class') ==  'firstPlayer')
-					return;
-				if(figure.attr('class') ==  'secondPlayer ui-draggable-disabled ui-state-disabled')
-					figure.remove();
-				if(figure.attr('class') ==  'firstPlayer ui-draggable-dragging')
-					return;
+				if($(this).attr('class') == 'cell step') {
+				    if(figure.attr('class') ==  'secondPlayer ui-draggable-disabled ui-state-disabled') {
+					    if(figure.text() == '♔') { alert('Black Win!'); window.location.reload(); }
+						figure.remove();
+					}
+					if(figure.attr('class') == 'firstPlayer') return;
+					ui.helper.appendTo(this);
+					ui.helper.css('top', '0px');
+					ui.helper.css('left', '0px');
+					changeMove();
+				}
 			}
 				
 			if(ui.helper.attr('class') == 'secondPlayer ui-draggable-dragging') {
-				if(figure.attr('class') ==  'secondPlayer')
-					return;
-				if(figure.attr('class') ==  'firstPlayer ui-draggable-disabled ui-state-disabled')
-					figure.remove();
-				if(figure.attr('class') ==  'secondPlayer ui-draggable-dragging')
-					return;
+				if($(this).attr('class') == 'cell step') {
+					if(figure.attr('class') ==  'firstPlayer ui-draggable-disabled ui-state-disabled') {
+						if(figure.text() == '♚') { alert('White Win!'); window.location.reload(); }
+					    figure.remove();
+					}
+					if(figure.attr('class') == 'secondPlayer') return;
+					ui.helper.appendTo(this);
+					ui.helper.css('top', '0px');
+					ui.helper.css('left', '0px');
+					changeMove();
+				}
 			}
 			
-			ui.helper.appendTo(this);
-			ui.helper.css('top', '0px');
-			ui.helper.css('left', '0px');
-			changeMove();
+			for(i = 0; i < 8; i++)
+			    for(j = 0; j < 8; j++)
+					cell[i][j].css('background', i % 2 != j % 2 ? color2 : color1).removeClass('step');
 		}
-	});
-	
+	});	
+	$('<input>').attr({type: 'button', onclick: 'window.location.reload()', id: 'btn', value: 'Начать заново'}).appendTo('body');
 	changeMove();
   </script>
 </body>

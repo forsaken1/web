@@ -1,22 +1,27 @@
 ﻿.firstPlayer {
-	font-size: 40pt;
-	margin-left: 10px;
+	margin-left: 5px;
 }
 
 .secondPlayer {
-	font-size: 40pt;
-	color: green;
-	margin-left: 10px;
+	margin-left: 5px;
 }
 
 .side {
-	font-size: 30pt;
 	margin-left: 20px;
 }
 
-td {
-	width: 75px;
-	height: 75px;
+.step {
+	background: Brown;
+	color: Brown;
+}
+
+#btn {
+	width: 150px;
+	height: 50px;
+	font-size: 14pt;
+}
+
+th {
 	background: IndianRed;
 }
 
